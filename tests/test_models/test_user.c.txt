@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include "models/user.h"
+#include "models/storage.h"
+#include "models/object.h"
+#include "models/user.c"
+#include "models/storage.c"
+#include "models/object.c"
+
+void test_user_instantiation() {
+    User *user = user_init();
+
+    // Tests for instantiation
+    if (user == NULL) {
+        printf("Failed to instantiate User object.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Tests for data types of attributes
+    if (strcmp("string", typeof(user->id)) != 0) {
+        printf("User id attribute is not of type string.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (strcmp("datetime", typeof(user->created_at)) != 0) {
+        printf("User created_at attribute is not of type datetime.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (strcmp("datetime", typeof(user->updated_at)) != 0) {
+        printf("User updated_at attribute is not of type datetime.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (strcmp("string", typeof(User.email)) != 0) {
+        printf("User email attribute is not of type string.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (strcmp("string", typeof(User.password)) != 0) {
+        printf("User password attribute is not of type string.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (strcmp("string", typeof(User.first_name)) != 0) {
+        printf("User first_name attribute is not of type string.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (strcmp("string", typeof(User.last_name)) != 0) {
+        printf("User last_name attribute is not of type string.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Test for non-NULL instantiation
+    if (user_find(user->id) != user) {
+        printf("Failed to find instantiated User object in storage.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("User instantiation tests passed.\n");
+
+    // Free memory
+    user_destroy(user);
+}
+
+void test_user_save() {
+    User *user = user_init();
+
+    // Test for saving
+    time_t start, end;
+    double elapsed;
+
+    time(&start);
+    user_save(user);
+    time(&end);
+
+    elapsed = difftime(end, start);
+    if (elapsed <= 0.05) {
+        printf("Failed to save User object with updated_at attribute.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("User save tests passed.\n");
+
+    // Free memory
+    user_destroy(user);
+}
+
+void test_user_to_dict() {
+    User *user = user_init();
+
+    // Test for to_dict method
+    Dict *dict = user_to_dict(user);
+
+    // Tests for attributes in dictionary
+    if (dict_find(dict, "id") == NULL) {
+        printf("Failed to include id attribute in to_dict method.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (dict_find(dict, "created_at") == NULL) {
+        printf("Failed to include created_at attribute in to_dict method.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (dict_find(dict, "updated_at") == NULL) {
+        printf("Failed to include updated_at attribute in to_dict method.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (dict_find(dict, "__class__") == NULL) {
+        printf("Failed to include __class__ attribute in to_dict method.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("User to_dict tests passed.\n");
+
+    // Free memory
+    dict_destroy(dict);
+    user_destroy(user);
+}
+
+int main() {
+    // Run tests
+    test_user_instantiation();
+    test_user_save();
+    test_user_to_dict();
+
+    return 0;
+}

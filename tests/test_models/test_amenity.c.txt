@@ -1,0 +1,220 @@
+// test_amenity.c
+// This file defines unit tests for the Amenity module.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include "unity.h"
+#include "amenity.h"
+
+// Helper function to simulate sleep in seconds
+void sleep_ms(int milliseconds) {
+    clock_t start_time = clock();
+    while (clock() < start_time + milliseconds * CLOCKS_PER_SEC / 1000);
+}
+
+// Unit test for Amenity instantiation
+void test_no_args_instantiates(void) {
+    Amenity *am = amenity_create();
+    TEST_ASSERT_NOT_NULL(am);
+    amenity_free(am);
+}
+
+void test_new_instance_stored_in_objects(void) {
+    Amenity *am = amenity_create();
+    TEST_ASSERT_TRUE(amenity_is_stored(am));
+    amenity_free(am);
+}
+
+void test_id_is_public_str(void) {
+    Amenity *am = amenity_create();
+    TEST_ASSERT_EQUAL_STRING(am->id, am->id); // Placeholder
+    amenity_free(am);
+}
+
+void test_created_at_is_public_datetime(void) {
+    Amenity *am = amenity_create();
+    TEST_ASSERT_EQUAL(sizeof(struct tm), sizeof(*(am->created_at)));
+    amenity_free(am);
+}
+
+void test_updated_at_is_public_datetime(void) {
+    Amenity *am = amenity_create();
+    TEST_ASSERT_EQUAL(sizeof(struct tm), sizeof(*(am->updated_at)));
+    amenity_free(am);
+}
+
+void test_name_is_public_class_attribute(void) {
+    Amenity *am = amenity_create();
+    TEST_ASSERT_NULL(am->name);
+    amenity_free(am);
+}
+
+void test_two_amenities_unique_ids(void) {
+    Amenity *am1 = amenity_create();
+    Amenity *am2 = amenity_create();
+    TEST_ASSERT_NOT_EQUAL_STRING(am1->id, am2->id);
+    amenity_free(am1);
+    amenity_free(am2);
+}
+
+void test_two_amenities_different_created_at(void) {
+    Amenity *am1 = amenity_create();
+    sleep_ms(50);
+    Amenity *am2 = amenity_create();
+    TEST_ASSERT_TRUE(difftime(mktime(am1->created_at), mktime(am2->created_at)) < 0);
+    amenity_free(am1);
+    amenity_free(am2);
+}
+
+void test_two_amenities_different_updated_at(void) {
+    Amenity *am1 = amenity_create();
+    sleep_ms(50);
+    Amenity *am2 = amenity_create();
+    TEST_ASSERT_TRUE(difftime(mktime(am1->updated_at), mktime(am2->updated_at)) < 0);
+    amenity_free(am1);
+    amenity_free(am2);
+}
+
+void test_str_representation(void) {
+    Amenity *am = amenity_create();
+    char *str = amenity_to_string(am);
+    TEST_ASSERT_NOT_NULL(str);
+    free(str);
+    amenity_free(am);
+}
+
+void test_args_unused(void) {
+    Amenity *am = amenity_create();
+    // In C, we typically wouldn't test this way, but for completeness:
+    TEST_ASSERT_TRUE(amenity_unused_args(am, NULL)); // Placeholder function
+    amenity_free(am);
+}
+
+void test_instantiation_with_kwargs(void) {
+    // This functionality may differ significantly in C.
+}
+
+void test_instantiation_with_None_kwargs(void) {
+    // This functionality may differ significantly in C.
+}
+
+// Tests for save method
+void setUp(void) {
+    // Setup code
+}
+
+void tearDown(void) {
+    // Teardown code
+}
+
+void test_one_save(void) {
+    Amenity *am = amenity_create();
+    sleep_ms(50);
+    time_t first_updated_at = mktime(am->updated_at);
+    amenity_save(am);
+    TEST_ASSERT_TRUE(difftime(first_updated_at, mktime(am->updated_at)) < 0);
+    amenity_free(am);
+}
+
+void test_two_saves(void) {
+    Amenity *am = amenity_create();
+    sleep_ms(50);
+    time_t first_updated_at = mktime(am->updated_at);
+    amenity_save(am);
+    time_t second_updated_at = mktime(am->updated_at);
+    TEST_ASSERT_TRUE(difftime(first_updated_at, second_updated_at) < 0);
+    sleep_ms(50);
+    amenity_save(am);
+    TEST_ASSERT_TRUE(difftime(second_updated_at, mktime(am->updated_at)) < 0);
+    amenity_free(am);
+}
+
+void test_save_with_arg(void) {
+    Amenity *am = amenity_create();
+    // Expect a failure since save with arg isn't supported
+    TEST_ASSERT_FALSE(amenity_save_with_arg(am, NULL)); // Placeholder
+    amenity_free(am);
+}
+
+void test_save_updates_file(void) {
+    Amenity *am = amenity_create();
+    amenity_save(am);
+    // Implement a check for file update
+    amenity_free(am);
+}
+
+// Tests for to_dict method
+void test_to_dict_type(void) {
+    Amenity *am = amenity_create();
+    TEST_ASSERT_EQUAL_PTR(am->to_dict, am->to_dict); // Placeholder
+    amenity_free(am);
+}
+
+void test_to_dict_contains_correct_keys(void) {
+    Amenity *am = amenity_create();
+    // Check for correct keys in the dictionary
+    amenity_free(am);
+}
+
+void test_to_dict_contains_added_attributes(void) {
+    Amenity *am = amenity_create();
+    // Add attributes and check
+    amenity_free(am);
+}
+
+void test_to_dict_datetime_attributes_are_strs(void) {
+    Amenity *am = amenity_create();
+    // Check datetime attributes
+    amenity_free(am);
+}
+
+void test_to_dict_output(void) {
+    Amenity *am = amenity_create();
+    // Check the output of to_dict
+    amenity_free(am);
+}
+
+void test_contrast_to_dict_dunder_dict(void) {
+    Amenity *am = amenity_create();
+    // Compare to_dict and __dict__ output
+    amenity_free(am);
+}
+
+void test_to_dict_with_arg(void) {
+    Amenity *am = amenity_create();
+    // Test to_dict with arg
+    amenity_free(am);
+}
+
+int main(void) {
+    UNITY_BEGIN();
+
+    RUN_TEST(test_no_args_instantiates);
+    RUN_TEST(test_new_instance_stored_in_objects);
+    RUN_TEST(test_id_is_public_str);
+    RUN_TEST(test_created_at_is_public_datetime);
+    RUN_TEST(test_updated_at_is_public_datetime);
+    RUN_TEST(test_name_is_public_class_attribute);
+    RUN_TEST(test_two_amenities_unique_ids);
+    RUN_TEST(test_two_amenities_different_created_at);
+    RUN_TEST(test_two_amenities_different_updated_at);
+    RUN_TEST(test_str_representation);
+    RUN_TEST(test_args_unused);
+    RUN_TEST(test_instantiation_with_kwargs);
+    RUN_TEST(test_instantiation_with_None_kwargs);
+    RUN_TEST(test_one_save);
+    RUN_TEST(test_two_saves);
+    RUN_TEST(test_save_with_arg);
+    RUN_TEST(test_save_updates_file);
+    RUN_TEST(test_to_dict_type);
+    RUN_TEST(test_to_dict_contains_correct_keys);
+    RUN_TEST(test_to_dict_contains_added_attributes);
+    RUN_TEST(test_to_dict_datetime_attributes_are_strs);
+    RUN_TEST(test_to_dict_output);
+    RUN_TEST(test_contrast_to_dict_dunder_dict);
+    RUN_TEST(test_to_dict_with_arg);
+
+    return UNITY_END();
+}

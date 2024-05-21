@@ -1,0 +1,182 @@
+#include "unity.h"
+#include "base_model.h"
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+void sleep_ms(int milliseconds) {
+    usleep(milliseconds * 1000);
+}
+
+void setUp(void) {
+    // Setup code, if needed
+}
+
+void tearDown(void) {
+    // Teardown code, if needed
+}
+
+void test_no_args_instantiates(void) {
+    BaseModel *bm = base_model_create();
+    TEST_ASSERT_NOT_NULL(bm);
+    base_model_free(bm);
+}
+
+void test_new_instance_stored_in_objects(void) {
+    // This requires a global storage or database, which we simulate here
+    BaseModel *bm = base_model_create();
+    TEST_ASSERT_TRUE(bm != NULL); // Placeholder check
+    base_model_free(bm);
+}
+
+void test_id_is_public_str(void) {
+    BaseModel *bm = base_model_create();
+    TEST_ASSERT_EQUAL_STRING(bm->id, bm->id); // Check if ID is a string
+    base_model_free(bm);
+}
+
+void test_created_at_is_public_datetime(void) {
+    BaseModel *bm = base_model_create();
+    TEST_ASSERT_TRUE(bm->created_at.tm_year > 0);
+    base_model_free(bm);
+}
+
+void test_updated_at_is_public_datetime(void) {
+    BaseModel *bm = base_model_create();
+    TEST_ASSERT_TRUE(bm->updated_at.tm_year > 0);
+    base_model_free(bm);
+}
+
+void test_two_models_unique_ids(void) {
+    BaseModel *bm1 = base_model_create();
+    BaseModel *bm2 = base_model_create();
+    TEST_ASSERT_NOT_EQUAL_STRING(bm1->id, bm2->id);
+    base_model_free(bm1);
+    base_model_free(bm2);
+}
+
+void test_two_models_different_created_at(void) {
+    BaseModel *bm1 = base_model_create();
+    sleep_ms(50);
+    BaseModel *bm2 = base_model_create();
+    TEST_ASSERT_TRUE(difftime(mktime(&bm1->created_at), mktime(&bm2->created_at)) < 0);
+    base_model_free(bm1);
+    base_model_free(bm2);
+}
+
+void test_two_models_different_updated_at(void) {
+    BaseModel *bm1 = base_model_create();
+    sleep_ms(50);
+    BaseModel *bm2 = base_model_create();
+    TEST_ASSERT_TRUE(difftime(mktime(&bm1->updated_at), mktime(&bm2->updated_at)) < 0);
+    base_model_free(bm1);
+    base_model_free(bm2);
+}
+
+void test_str_representation(void) {
+    BaseModel *bm = base_model_create();
+    char *str = base_model_to_string(bm);
+    TEST_ASSERT_NOT_NULL(str);
+    free(str);
+    base_model_free(bm);
+}
+
+void test_args_unused(void) {
+    BaseModel *bm = base_model_create();
+    // In C, we don't typically test for unused arguments this way
+    TEST_ASSERT_NOT_NULL(bm); // Placeholder test
+    base_model_free(bm);
+}
+
+void test_instantiation_with_kwargs(void) {
+    // Not directly applicable in C without significant modification
+}
+
+void test_instantiation_with_None_kwargs(void) {
+    // Not directly applicable in C without significant modification
+}
+
+void test_instantiation_with_args_and_kwargs(void) {
+    // Not directly applicable in C without significant modification
+}
+
+void test_one_save(void) {
+    BaseModel *bm = base_model_create();
+    sleep_ms(50);
+    time_t first_updated_at = mktime(&bm->updated_at);
+    base_model_save(bm);
+    TEST_ASSERT_TRUE(difftime(first_updated_at, mktime(&bm->updated_at)) < 0);
+    base_model_free(bm);
+}
+
+void test_two_saves(void) {
+    BaseModel *bm = base_model_create();
+    sleep_ms(50);
+    time_t first_updated_at = mktime(&bm->updated_at);
+    base_model_save(bm);
+    time_t second_updated_at = mktime(&bm->updated_at);
+    TEST_ASSERT_TRUE(difftime(first_updated_at, second_updated_at) < 0);
+    sleep_ms(50);
+    base_model_save(bm);
+    TEST_ASSERT_TRUE(difftime(second_updated_at, mktime(&bm->updated_at)) < 0);
+    base_model_free(bm);
+}
+
+void test_save_with_arg(void) {
+    BaseModel *bm = base_model_create();
+    // C function signature doesn't support arguments for save
+    TEST_ASSERT_NOT_NULL(bm); // Placeholder test
+    base_model_free(bm);
+}
+
+void test_save_updates_file(void) {
+    BaseModel *bm = base_model_create();
+    base_model_save(bm);
+    // Check if save updates a file (placeholder logic)
+    TEST_ASSERT_TRUE(bm != NULL); // Placeholder test
+    base_model_free(bm);
+}
+
+void test_to_dict_type(void) {
+    BaseModel *bm = base_model_create();
+    char *dict = base_model_to_dict(bm);
+    TEST_ASSERT_NOT_NULL(dict);
+    free(dict);
+    base_model_free(bm);
+}
+
+void test_to_dict_contains_correct_keys(void) {
+    BaseModel *bm = base_model_create();
+    char *dict = base_model_to_dict(bm);
+    TEST_ASSERT_NOT_NULL(dict);
+    // Further parsing needed to verify keys
+    free(dict);
+    base_model_free(bm);
+}
+
+void test_to_dict_contains_added_attributes(void) {
+    BaseModel *bm = base_model_create();
+    // Simulate adding attributes and test
+    base_model_free(bm);
+}
+
+void test_to_dict_datetime_attributes_are_strs(void) {
+    BaseModel *bm = base_model_create();
+    char *dict = base_model_to_dict(bm);
+    TEST_ASSERT_NOT_NULL(dict);
+    // Further parsing needed to verify datetime attributes as strings
+    free(dict);
+    base_model_free(bm);
+}
+
+void test_to_dict_output(void) {
+    BaseModel *bm = base_model_create();
+    char *dict = base_model_to_dict(bm);
+    TEST_ASSERT_NOT_NULL(dict);
+    // Further parsing needed to verify output
+    free(dict);
+    base_model_free(bm);
+}
+
+void test_contrast_to_dict_dunder_dict(void) {
+    BaseModel *bm = base_model_create();

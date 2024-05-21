@@ -1,0 +1,125 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "models/base_model.h"
+#include "models/engine/file_storage.h"
+#include "models/user.h"
+#include "models/state.h"
+#include "models/place.h"
+#include "models/city.h"
+#include "models/amenity.h"
+#include "models/review.h"
+#include "models/base_model.c"
+#include "models/engine/file_storage.c"
+#include "models/user.c"
+#include "models/state.c"
+#include "models/place.c"
+#include "models/city.c"
+#include "models/amenity.c"
+#include "models/review.c"
+
+void test_file_storage_instantiation() {
+    FileStorage *file_storage = file_storage_create();
+
+    // Test instantiation with no args
+    if (file_storage == NULL) {
+        printf("Failed to instantiate FileStorage object.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Test instantiation with arg
+    // C doesn't support this type of argument check as in Python
+
+    // Test file path and objects attributes
+    if (strcmp("string", typeof(file_storage->file_path)) != 0) {
+        printf("FileStorage file_path attribute is not of type string.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (strcmp("dict", typeof(file_storage->objects)) != 0) {
+        printf("FileStorage objects attribute is not of type dict.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Test if storage is properly initialized
+    if (strcmp("FileStorage", typeof(models.storage)) != 0) {
+        printf("Failed to initialize models.storage as FileStorage object.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("FileStorage instantiation tests passed.\n");
+
+    // Free memory
+    file_storage_destroy(file_storage);
+}
+
+void test_file_storage_methods() {
+    // This setup/teardown might need modification based on the actual implementation
+    // as it relies on file operations which might not be available in a test environment.
+    // In C, we generally rely more on function stubs or mocks for such operations.
+
+    // Test setup
+
+    // Test all method
+    if (strcmp("dict", typeof(models.storage->all())) != 0) {
+        printf("Failed to retrieve dictionary from FileStorage all method.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Test all method with arg
+    // C doesn't support this type of argument check as in Python
+
+    // Test new method
+    BaseModel *bm = base_model_init();
+    User *us = user_init();
+    State *st = state_init();
+    Place *pl = place_init();
+    City *cy = city_init();
+    Amenity *am = amenity_init();
+    Review *rv = review_init();
+    models_storage_new(bm);
+    models_storage_new(us);
+    models_storage_new(st);
+    models_storage_new(pl);
+    models_storage_new(cy);
+    models_storage_new(am);
+    models_storage_new(rv);
+    Dict *objects = models.storage->objects;
+    if (dict_find(objects, "BaseModel." + bm->id) == NULL ||
+        dict_find(objects, "User." + us->id) == NULL ||
+        dict_find(objects, "State." + st->id) == NULL ||
+        dict_find(objects, "Place." + pl->id) == NULL ||
+        dict_find(objects, "City." + cy->id) == NULL ||
+        dict_find(objects, "Amenity." + am->id) == NULL ||
+        dict_find(objects, "Review." + rv->id) == NULL) {
+        printf("Failed to add objects to FileStorage.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("FileStorage new method tests passed.\n");
+
+    // Test new method with args
+    // C doesn't support this type of argument check as in Python
+
+    // Test save method
+    models_storage_save();
+    // Check if save operations were successful, assuming file operations are properly handled
+
+    // Test save method with arg
+    // C doesn't support this type of argument check as in Python
+
+    // Test reload method
+    models_storage_reload();
+    // Check if reload operations were successful, assuming file operations are properly handled
+
+    // Test reload method with arg
+    // C doesn't support this type of argument check as in Python
+}
+
+int main() {
+    // Run tests
+    test_file_storage_instantiation();
+    test_file_storage_methods();
+
+    return 0;
+}

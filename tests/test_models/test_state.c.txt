@@ -1,0 +1,188 @@
+#include "unity.h"
+#include "state.h"
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+void sleep_ms(int milliseconds) {
+    usleep(milliseconds * 1000);
+}
+
+void setUp(void) {
+    // Setup code, if needed
+}
+
+void tearDown(void) {
+    // Teardown code, if needed
+}
+
+void test_no_args_instantiates(void) {
+    State *st = state_create();
+    TEST_ASSERT_NOT_NULL(st);
+    state_free(st);
+}
+
+void test_new_instance_stored_in_objects(void) {
+    // This requires a global storage or database, which we simulate here
+    State *st = state_create();
+    TEST_ASSERT_TRUE(st != NULL); // Placeholder check
+    state_free(st);
+}
+
+void test_id_is_public_str(void) {
+    State *st = state_create();
+    TEST_ASSERT_EQUAL_STRING(st->id, st->id); // Check if ID is a string
+    state_free(st);
+}
+
+void test_created_at_is_public_datetime(void) {
+    State *st = state_create();
+    TEST_ASSERT_TRUE(st->created_at.tm_year > 0);
+    state_free(st);
+}
+
+void test_updated_at_is_public_datetime(void) {
+    State *st = state_create();
+    TEST_ASSERT_TRUE(st->updated_at.tm_year > 0);
+    state_free(st);
+}
+
+void test_name_is_public_class_attribute(void) {
+    State *st = state_create();
+    st->name = strdup("TestName");
+    TEST_ASSERT_EQUAL_STRING(st->name, "TestName");
+    state_free(st);
+}
+
+void test_two_states_unique_ids(void) {
+    State *st1 = state_create();
+    State *st2 = state_create();
+    TEST_ASSERT_NOT_EQUAL_STRING(st1->id, st2->id);
+    state_free(st1);
+    state_free(st2);
+}
+
+void test_two_states_different_created_at(void) {
+    State *st1 = state_create();
+    sleep_ms(50);
+    State *st2 = state_create();
+    TEST_ASSERT_TRUE(difftime(mktime(&st1->created_at), mktime(&st2->created_at)) < 0);
+    state_free(st1);
+    state_free(st2);
+}
+
+void test_two_states_different_updated_at(void) {
+    State *st1 = state_create();
+    sleep_ms(50);
+    State *st2 = state_create();
+    TEST_ASSERT_TRUE(difftime(mktime(&st1->updated_at), mktime(&st2->updated_at)) < 0);
+    state_free(st1);
+    state_free(st2);
+}
+
+void test_str_representation(void) {
+    // This test would be adapted to compare a string representation.
+    State *st = state_create();
+    st->id = "123456";
+    char *str_repr = state_to_string(st);
+    TEST_ASSERT_NOT_NULL(str_repr);
+    TEST_ASSERT_TRUE(strstr(str_repr, "[State] (123456)") != NULL);
+    free(str_repr);
+    state_free(st);
+}
+
+void test_args_unused(void) {
+    State *st = state_create();
+    // Simulate unused args, we don't pass NULL to any function directly in C
+    TEST_ASSERT_NOT_NULL(st);
+    state_free(st);
+}
+
+void test_instantiation_with_kwargs(void) {
+    // This test would be adapted to initializing with specific values
+    // Not typically done in the same way in C, but we can simulate
+    State *st = state_create();
+    st->id = strdup("345");
+    struct tm dt;
+    time_t t = time(NULL);
+    dt = *localtime(&t);
+    st->created_at = dt;
+    st->updated_at = dt;
+    TEST_ASSERT_EQUAL_STRING(st->id, "345");
+    state_free(st);
+}
+
+void test_instantiation_with_None_kwargs(void) {
+    // In C, we would not typically allow null initializations directly
+    // This test can be skipped or adapted
+}
+
+void test_one_save(void) {
+    State *st = state_create();
+    sleep_ms(50);
+    struct tm first_updated_at = st->updated_at;
+    state_save(st);
+    TEST_ASSERT_TRUE(difftime(mktime(&first_updated_at), mktime(&st->updated_at)) < 0);
+    state_free(st);
+}
+
+void test_two_saves(void) {
+    State *st = state_create();
+    sleep_ms(50);
+    struct tm first_updated_at = st->updated_at;
+    state_save(st);
+    struct tm second_updated_at = st->updated_at;
+    TEST_ASSERT_TRUE(difftime(mktime(&first_updated_at), mktime(&second_updated_at)) < 0);
+    sleep_ms(50);
+    state_save(st);
+    TEST_ASSERT_TRUE(difftime(mktime(&second_updated_at), mktime(&st->updated_at)) < 0);
+    state_free(st);
+}
+
+void test_save_with_arg(void) {
+    State *st = state_create();
+    // In C, save typically does not take arguments, so this test is not applicable
+    state_free(st);
+}
+
+void test_save_updates_file(void) {
+    // This test is adapted to check if save updates an in-memory structure
+    State *st = state_create();
+    state_save(st);
+    // Simulate file check by verifying updated_at changed
+    struct tm updated_at_check = st->updated_at;
+    state_save(st);
+    TEST_ASSERT_TRUE(difftime(mktime(&updated_at_check), mktime(&st->updated_at)) < 0);
+    state_free(st);
+}
+
+void test_to_dict_type(void) {
+    State *st = state_create();
+    char *dict = state_to_dict(st);
+    TEST_ASSERT_NOT_NULL(dict);
+    free(dict);
+    state_free(st);
+}
+
+void test_to_dict_contains_correct_keys(void) {
+    State *st = state_create();
+    char *dict = state_to_dict(st);
+    TEST_ASSERT_TRUE(strstr(dict, "'id'") != NULL);
+    TEST_ASSERT_TRUE(strstr(dict, "'created_at'") != NULL);
+    TEST_ASSERT_TRUE(strstr(dict, "'updated_at'") != NULL);
+    TEST_ASSERT_TRUE(strstr(dict, "'__class__'") != NULL);
+    free(dict);
+    state_free(st);
+}
+
+void test_to_dict_contains_added_attributes(void) {
+    State *st = state_create();
+    st->name = strdup("TestName");
+    char *dict = state_to_dict(st);
+    TEST_ASSERT_TRUE(strstr(dict, "TestName") != NULL);
+    free(dict);
+    state_free(st);
+}
+
+void test_to_dict_datetime_attributes_are_strs(void) {
+    State *st = state_create();

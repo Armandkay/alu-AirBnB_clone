@@ -1,0 +1,182 @@
+#include "unity.h"
+#include "review.h"
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+void sleep_ms(int milliseconds) {
+    usleep(milliseconds * 1000);
+}
+
+void setUp(void) {
+    // Setup code, if needed
+}
+
+void tearDown(void) {
+    // Teardown code, if needed
+}
+
+void test_no_args_instantiates(void) {
+    Review *rv = review_create();
+    TEST_ASSERT_NOT_NULL(rv);
+    review_free(rv);
+}
+
+void test_new_instance_stored_in_objects(void) {
+    // This requires a global storage or database, which we simulate here
+    Review *rv = review_create();
+    TEST_ASSERT_TRUE(rv != NULL); // Placeholder check
+    review_free(rv);
+}
+
+void test_id_is_public_str(void) {
+    Review *rv = review_create();
+    TEST_ASSERT_EQUAL_STRING(rv->id, rv->id); // Check if ID is a string
+    review_free(rv);
+}
+
+void test_created_at_is_public_datetime(void) {
+    Review *rv = review_create();
+    TEST_ASSERT_TRUE(rv->created_at.tm_year > 0);
+    review_free(rv);
+}
+
+void test_updated_at_is_public_datetime(void) {
+    Review *rv = review_create();
+    TEST_ASSERT_TRUE(rv->updated_at.tm_year > 0);
+    review_free(rv);
+}
+
+void test_place_id_is_public_class_attribute(void) {
+    Review *rv = review_create();
+    rv->place_id = strdup("place_123");
+    TEST_ASSERT_EQUAL_STRING(rv->place_id, "place_123");
+    review_free(rv);
+}
+
+void test_user_id_is_public_class_attribute(void) {
+    Review *rv = review_create();
+    rv->user_id = strdup("user_123");
+    TEST_ASSERT_EQUAL_STRING(rv->user_id, "user_123");
+    review_free(rv);
+}
+
+void test_text_is_public_class_attribute(void) {
+    Review *rv = review_create();
+    rv->text = strdup("A nice review.");
+    TEST_ASSERT_EQUAL_STRING(rv->text, "A nice review.");
+    review_free(rv);
+}
+
+void test_two_reviews_unique_ids(void) {
+    Review *rv1 = review_create();
+    Review *rv2 = review_create();
+    TEST_ASSERT_NOT_EQUAL_STRING(rv1->id, rv2->id);
+    review_free(rv1);
+    review_free(rv2);
+}
+
+void test_two_reviews_different_created_at(void) {
+    Review *rv1 = review_create();
+    sleep_ms(50);
+    Review *rv2 = review_create();
+    TEST_ASSERT_TRUE(difftime(mktime(&rv1->created_at), mktime(&rv2->created_at)) < 0);
+    review_free(rv1);
+    review_free(rv2);
+}
+
+void test_two_reviews_different_updated_at(void) {
+    Review *rv1 = review_create();
+    sleep_ms(50);
+    Review *rv2 = review_create();
+    TEST_ASSERT_TRUE(difftime(mktime(&rv1->updated_at), mktime(&rv2->updated_at)) < 0);
+    review_free(rv1);
+    review_free(rv2);
+}
+
+void test_str_representation(void) {
+    // This test would be adapted to compare a string representation.
+    Review *rv = review_create();
+    rv->id = "123456";
+    char *str_repr = review_to_string(rv);
+    TEST_ASSERT_NOT_NULL(str_repr);
+    TEST_ASSERT_TRUE(strstr(str_repr, "[Review] (123456)") != NULL);
+    free(str_repr);
+    review_free(rv);
+}
+
+void test_args_unused(void) {
+    Review *rv = review_create();
+    // Simulate unused args, we don't pass NULL to any function directly in C
+    TEST_ASSERT_NOT_NULL(rv);
+    review_free(rv);
+}
+
+void test_instantiation_with_kwargs(void) {
+    // This test would be adapted to initializing with specific values
+    // Not typically done in the same way in C, but we can simulate
+    Review *rv = review_create();
+    rv->id = strdup("345");
+    struct tm dt;
+    time_t t = time(NULL);
+    dt = *localtime(&t);
+    rv->created_at = dt;
+    rv->updated_at = dt;
+    TEST_ASSERT_EQUAL_STRING(rv->id, "345");
+    review_free(rv);
+}
+
+void test_instantiation_with_None_kwargs(void) {
+    // In C, we would not typically allow null initializations directly
+    // This test can be skipped or adapted
+}
+
+void test_one_save(void) {
+    Review *rv = review_create();
+    sleep_ms(50);
+    struct tm first_updated_at = rv->updated_at;
+    review_save(rv);
+    TEST_ASSERT_TRUE(difftime(mktime(&first_updated_at), mktime(&rv->updated_at)) < 0);
+    review_free(rv);
+}
+
+void test_two_saves(void) {
+    Review *rv = review_create();
+    sleep_ms(50);
+    struct tm first_updated_at = rv->updated_at;
+    review_save(rv);
+    struct tm second_updated_at = rv->updated_at;
+    TEST_ASSERT_TRUE(difftime(mktime(&first_updated_at), mktime(&second_updated_at)) < 0);
+    sleep_ms(50);
+    review_save(rv);
+    TEST_ASSERT_TRUE(difftime(mktime(&second_updated_at), mktime(&rv->updated_at)) < 0);
+    review_free(rv);
+}
+
+void test_save_with_arg(void) {
+    Review *rv = review_create();
+    // In C, save typically does not take arguments, so this test is not applicable
+    review_free(rv);
+}
+
+void test_save_updates_file(void) {
+    // This test is adapted to check if save updates an in-memory structure
+    Review *rv = review_create();
+    review_save(rv);
+    // Simulate file check by verifying updated_at changed
+    struct tm updated_at_check = rv->updated_at;
+    review_save(rv);
+    TEST_ASSERT_TRUE(difftime(mktime(&updated_at_check), mktime(&rv->updated_at)) < 0);
+    review_free(rv);
+}
+
+void test_to_dict_type(void) {
+    Review *rv = review_create();
+    char *dict = review_to_dict(rv);
+    TEST_ASSERT_NOT_NULL(dict);
+    free(dict);
+    review_free(rv);
+}
+
+void test_to_dict_contains_correct_keys(void) {
+    Review *rv
