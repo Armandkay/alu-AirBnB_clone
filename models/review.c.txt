@@ -1,0 +1,34 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "models/review.h"
+
+Review *review_create() {
+    return (Review *)malloc(sizeof(Review));
+}
+
+void review_init(Review *review) {
+    base_model_init(&review->base);
+    review->place_id = (char *)malloc(37); /* Adjust size as needed */
+    strcpy(review->place_id, "");
+    review->user_id = (char *)malloc(37); /* Adjust size as needed */
+    strcpy(review->user_id, "");
+    review->text = (char *)malloc(256); /* Adjust size as needed */
+    strcpy(review->text, "");
+}
+
+void review_destroy(Review *review) {
+    if (review != NULL) {
+        free(review->place_id);
+        free(review->user_id);
+        free(review->text);
+        base_model_destroy(&review->base);
+    }
+    free(review);
+}
+
+char *review_to_string(Review *review) {
+    char *str = (char *)malloc(256); /* Adjust size as needed */
+    sprintf(str, "[%s] (%s) {'place_id': %s, 'user_id': %s, 'text': %s}", "Review", review->base.id, review->place_id, review->user_id, review->text);
+    return str;
+}

@@ -1,0 +1,45 @@
+#ifndef BASE_MODEL_H
+#define BASE_MODEL_H
+
+#include <time.h>
+
+typedef struct {
+    char *id;
+    time_t created_at;
+    time_t updated_at;
+} BaseModel;
+
+BaseModel *base_model_create(size_t size);
+void base_model_init(BaseModel *base_model);
+void base_model_destroy(BaseModel *base_model);
+char *base_model_to_string(BaseModel *base_model);
+
+#endif /* BASE_MODEL_H */#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include "models/base_model.h"
+
+BaseModel *base_model_create(size_t size) {
+    return (BaseModel *)malloc(size);
+}
+
+void base_model_init(BaseModel *base_model) {
+    base_model->id = (char *)malloc(37); /* UUID is 36 chars + null terminator */
+    strcpy(base_model->id, "00000000-0000-0000-0000-000000000000");
+    base_model->created_at = time(NULL);
+    base_model->updated_at = time(NULL);
+}
+
+void base_model_destroy(BaseModel *base_model) {
+    if (base_model != NULL) {
+        free(base_model->id);
+        free(base_model);
+    }
+}
+
+char *base_model_to_string(BaseModel *base_model) {
+    char *str = (char *)malloc(128); /* Adjust size as needed */
+    sprintf(str, "[%s] (%s) {'created_at': %ld, 'updated_at': %ld}", "BaseModel", base_model->id, base_model->created_at, base_model->updated_at);
+    return str;
+}

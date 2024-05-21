@@ -1,0 +1,37 @@
+#ifndef AMENITY_H
+#define AMENITY_H
+
+#include "models/base_model.h"
+
+typedef struct {
+    BaseModel base;
+    char *name;
+} Amenity;
+
+Amenity *amenity_create();
+void amenity_init(Amenity *amenity);
+void amenity_destroy(Amenity *amenity);
+
+#endif /* AMENITY_H */
+#include <stdlib.h>
+#include <string.h>
+#include "models/amenity.h"
+
+Amenity *amenity_create() {
+    return (Amenity *)base_model_create(sizeof(Amenity));
+}
+
+void amenity_init(Amenity *amenity) {
+    base_model_init((BaseModel *)amenity);
+    amenity->name = NULL;
+}
+
+void amenity_destroy(Amenity *amenity) {
+    if (amenity != NULL) {
+        if (amenity->name != NULL) {
+            free(amenity->name);
+            amenity->name = NULL;
+        }
+        base_model_destroy((BaseModel *)amenity);
+    }
+}

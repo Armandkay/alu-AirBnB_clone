@@ -1,0 +1,31 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "models/city.h"
+
+City *city_create() {
+    return (City *)malloc(sizeof(City));
+}
+
+void city_init(City *city) {
+    base_model_init(&city->base);
+    city->state_id = (char *)malloc(37); /* Adjust size as needed */
+    strcpy(city->state_id, "");
+    city->name = (char *)malloc(256); /* Adjust size as needed */
+    strcpy(city->name, "");
+}
+
+void city_destroy(City *city) {
+    if (city != NULL) {
+        free(city->state_id);
+        free(city->name);
+        base_model_destroy(&city->base);
+    }
+    free(city);
+}
+
+char *city_to_string(City *city) {
+    char *str = (char *)malloc(256); /* Adjust size as needed */
+    sprintf(str, "[%s] (%s) {'state_id': %s, 'name': %s}", "City", city->base.id, city->state_id, city->name);
+    return str;
+}

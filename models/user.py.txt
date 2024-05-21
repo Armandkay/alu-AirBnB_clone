@@ -1,0 +1,38 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "models/user.h"
+
+User *user_create() {
+    return (User *)malloc(sizeof(User));
+}
+
+void user_init(User *user) {
+    base_model_init(&user->base);
+    user->email = (char *)malloc(256); /* Adjust size as needed */
+    user->password = (char *)malloc(256); /* Adjust size as needed */
+    user->first_name = (char *)malloc(256); /* Adjust size as needed */
+    user->last_name = (char *)malloc(256); /* Adjust size as needed */
+    strcpy(user->email, "");
+    strcpy(user->password, "");
+    strcpy(user->first_name, "");
+    strcpy(user->last_name, "");
+}
+
+void user_destroy(User *user) {
+    if (user != NULL) {
+        free(user->email);
+        free(user->password);
+        free(user->first_name);
+        free(user->last_name);
+        base_model_destroy(&user->base);
+    }
+    free(user);
+}
+
+char *user_to_string(User *user) {
+    char *str = (char *)malloc(1024); /* Adjust size as needed */
+    sprintf(str, "[%s] (%s) {'email': %s, 'password': %s, 'first_name': %s, 'last_name': %s}",
+            "User", user->base.id, user->email, user->password, user->first_name, user->last_name);
+    return str;
+}

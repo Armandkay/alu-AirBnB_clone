@@ -1,0 +1,28 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "models/state.h"
+
+State *state_create() {
+    return (State *)malloc(sizeof(State));
+}
+
+void state_init(State *state) {
+    base_model_init(&state->base);
+    state->name = (char *)malloc(256); /* Adjust size as needed */
+    strcpy(state->name, "");
+}
+
+void state_destroy(State *state) {
+    if (state != NULL) {
+        free(state->name);
+        base_model_destroy(&state->base);
+    }
+    free(state);
+}
+
+char *state_to_string(State *state) {
+    char *str = (char *)malloc(256); /* Adjust size as needed */
+    sprintf(str, "[%s] (%s) {'name': %s}", "State", state->base.id, state->name);
+    return str;
+}

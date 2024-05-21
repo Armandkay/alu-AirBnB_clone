@@ -1,0 +1,57 @@
+#include "models/file_storage.h"
+
+FileStorage *file_storage_create() {
+    return (FileStorage *)malloc(sizeof(FileStorage));
+}
+
+void file_storage_init(FileStorage *fs) {
+    fs->file_path = "file.json";
+    fs->num_objects = 0;
+}
+
+void file_storage_destroy(FileStorage *fs) {
+    free(fs);
+}
+
+void file_storage_save(FileStorage *fs) {
+    FILE *file = fopen(fs->file_path, "w");
+    if (file != NULL) {
+        /* Loop through each object and write to file */
+        for (int i = 0; i < fs->num_objects; i++) {
+            BaseModel *obj = fs->objects[i];
+            char *str = obj->to_string(obj);
+            fprintf(file, "%s\n", str);
+            free(str);
+        }
+        fclose(file);
+    }
+}
+
+void file_storage_reload(FileStorage *fs) {
+    FILE *file = fopen(fs->file_path, "r");
+    if (file != NULL) {
+        char buffer[1024]; /* Adjust size as needed */
+        while (fgets(buffer, sizeof(buffer), file) != NULL) {
+            /* Parse each line and create objects */
+            /* Implement your parsing logic here */
+        }
+        fclose(file);
+    }
+}
+
+void file_storage_new(FileStorage *fs, BaseModel *obj) {
+    if (fs->num_objects < MAX_OBJECTS) {
+        fs->objects[fs->num_objects++] = obj;
+    } else {
+        fprintf(stderr, "Maximum number of objects reached.\n");
+    }
+}
+
+void file_storage_all(FileStorage *fs) {
+    for (int i = 0; i < fs->num_objects; i++) {
+        BaseModel *obj = fs->objects[i];
+        char *str = obj->to_string(obj);
+        printf("%s\n", str);
+        free(str);
+    }
+}

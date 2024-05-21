@@ -1,0 +1,27 @@
+#include "models/base_model.h"
+#include "models/engine/file_storage.h"
+#include "models/user.h"
+#include "models/state.h"
+#include "models/place.h"
+#include "models/city.h"
+#include "models/amenity.h"
+#include "models/review.h"
+
+FileStorage *storage;
+Dict *loaded_objects;
+
+void models_init() {
+    // Initialize file storage
+    storage = file_storage_create();
+    file_storage_reload(storage);
+    loaded_objects = storage->all();
+
+    // Register model classes
+    dict_set(loaded_objects, "BaseModel", BaseModel);
+    dict_set(loaded_objects, "User", User);
+    dict_set(loaded_objects, "State", State);
+    dict_set(loaded_objects, "City", City);
+    dict_set(loaded_objects, "Amenity", Amenity);
+    dict_set(loaded_objects, "Place", Place);
+    dict_set(loaded_objects, "Review", Review);
+}

@@ -1,0 +1,51 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "models/place.h"
+
+Place *place_create() {
+    return (Place *)malloc(sizeof(Place));
+}
+
+void place_init(Place *place) {
+    base_model_init(&place->base);
+    place->city_id = (char *)malloc(37); /* Adjust size as needed */
+    strcpy(place->city_id, "");
+    place->user_id = (char *)malloc(37); /* Adjust size as needed */
+    strcpy(place->user_id, "");
+    place->name = (char *)malloc(256); /* Adjust size as needed */
+    strcpy(place->name, "");
+    place->description = (char *)malloc(256); /* Adjust size as needed */
+    strcpy(place->description, "");
+    place->number_rooms = 0;
+    place->number_bathrooms = 0;
+    place->max_guest = 0;
+    place->price_by_night = 0;
+    place->latitude = 0.0;
+    place->longitude = 0.0;
+    place->amenity_ids = NULL;
+    place->num_amenities = 0;
+}
+
+void place_destroy(Place *place) {
+    if (place != NULL) {
+        free(place->city_id);
+        free(place->user_id);
+        free(place->name);
+        free(place->description);
+        if (place->amenity_ids != NULL) {
+            for (int i = 0; i < place->num_amenities; i++) {
+                free(place->amenity_ids[i]);
+            }
+            free(place->amenity_ids);
+        }
+        base_model_destroy(&place->base);
+    }
+    free(place);
+}
+
+char *place_to_string(Place *place) {
+    char *str = (char *)malloc(256); /* Adjust size as needed */
+    sprintf(str, "[%s] (%s) {'city_id': %s, 'user_id': %s, 'name': %s, 'description': %s, 'number_rooms': %d, 'number_bathrooms': %d, 'max_guest': %d, 'price_by_night': %d, 'latitude': %.2f, 'longitude': %.2f}", "Place", place->base.id, place->city_id, place->user_id, place->name, place->description, place->number_rooms, place->number_bathrooms, place->max_guest, place->price_by_night, place->latitude, place->longitude);
+    return str;
+}
